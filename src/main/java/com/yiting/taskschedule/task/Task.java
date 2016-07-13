@@ -27,10 +27,10 @@ import java.util.concurrent.Future;
 public class Task implements Callable<String>, Serializable {
 	private static final Logger logger = Logger.getLogger(Task.class);
 
-	private static final int FLAG_RUNSTATUS_START = 0;
-	private static final int FLAG_RUNSTATUS_FINISHED = 1;
-	private static final int FLAG_RUNSTATUS_INTERRUPTED = 2;
-	private static final int FLAG_RUNSTATUS_STASHED = 3;
+	public static final int FLAG_RUNSTATUS_START = 0;
+	public static final int FLAG_RUNSTATUS_FINISHED = 1;
+	public static final int FLAG_RUNSTATUS_INTERRUPTED = 2;
+	public static final int FLAG_RUNSTATUS_STASHED = 3;
 
 	private JsonParser jsonParser = new JsonParser();
 	private Gson gson = new Gson();
@@ -125,15 +125,6 @@ public class Task implements Callable<String>, Serializable {
 				logger.warn("sched task exec exception!", ex);
 				for (int i = jobList.size(); i > 0; i--) {
 					Callable<Export> job = jobList.get(i - 1);
-//					Method method = getMethod(job.getClass(), "destroy");
-//					if (method != null) {
-//						try {
-//							method.invoke(job);
-//						} catch (Exception e1) {
-//							logger.warn("destroy method invoke exception.");
-//							e1.printStackTrace();
-//						}
-//					}
 					ReflectUtil.invoke(job,"destroy");
 				}
 				runStatus = FLAG_RUNSTATUS_INTERRUPTED;
@@ -141,9 +132,62 @@ public class Task implements Callable<String>, Serializable {
 			}
 		}
 
+		logger.info("Msg Payload: " + payload + " FromSet: " + fromSet);
+		switch (runStatus) {
+			case FLAG_RUNSTATUS_FINISHED:
+				SchedUtils.clear(payload.getUniqueId());
+				logger.info("[Task Finished] " + getUniqueId() + " JobList: " + formatExecedJobList());
+				StatUtils.set(Const.STAT_CMD_ACC, Const.STAT_KEY_TASK_SUM, 1);
+				StatUtils.set(Const.STAT_CMD_ACC, Const.STAT_KEY_TASK_FINISH, 1);
+				break;
+			case FLAG_RUNSTATUS_INTERRUPTED:
+				SchedUtils.clear(payload.getUniqueId());
+				logger.info("[Task Interrupt] " + getUniqueId() + " JobList: " + formatExecedJobList());
+				logger.info("[Task Interrupt] " + getUniqueId() + " allExport: " + allExport);
+				logger.info("[Task Interrupt] " + getUniqueId() + " globalExport: " + globalExport);
+				StatUtils.set(Const.STAT_CMD_ACC, Const.STAT_KEY_TASK_SUM, 1);
+				StatUtils.set(Const.STAT_CMD_ACC, Const.STAT_KEY_TASK_INTERRUPT, 1);
+				break;
+			case FLAG_RUNSTATUS_STASHED:
+				logger.info("[Task Stashed, Wait Message Event Trigger] " + getUniqueId() + " JobList: "
+						+ formatExecedJobList());
+				StatUtils.set(Const.STAT_CMD_SADD, Const.STAT_KEY_TASK_STASHED_SET, getUniqueId());
+				break;
+			case FLAG_RUNSTATUS_START:
+			default:
+				logger.info("Attention! No Job Execed!");
+				break;
+		}
+
 		return null;
 	}
 
+
+	public Map<String, Object> toSimpleMap() {
+		Map<String, Object> content = new HashMap<String, Object>();
+		content.put("name", this.name);
+		content.put("cur", this.cur);
+		List<String> jobs = new ArrayList<String>();
+		for (Callable c : jobList) {
+			jobs.add(c.toString());
+		}
+		content.put("jobs", jobs);
+		return content;
+	}
+
+	private String formatExecedJobList() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int i = 0; i < jobList.size(); i++) {
+			Callable job = jobList.get(i);
+			if (i > 0) {
+				sb.append(" ==> ");
+			}
+			sb.append(job.getClass().getSimpleName());
+		}
+		sb.append("]");
+		return sb.toString();
+	}
 
 	private void handleJobExport(String jobName, Export e) {
 		allExport.put(jobName, e);

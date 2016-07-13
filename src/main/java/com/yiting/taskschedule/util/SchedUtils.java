@@ -159,7 +159,7 @@ public class SchedUtils {
 		offerQueueingTask(queueingTaskMessage);
 	}
 
-	private static boolean offerQueueingTask(QueueingTaskMessage queueingTaskMessage) {
+	public static boolean offerQueueingTask(QueueingTaskMessage queueingTaskMessage) {
 		boolean ret=queueingTaskMessageQueue.offer(queueingTaskMessage);
 		if(!ret){
 			logger.warn("the uuid queueingTaskMessageQueue is full! qt = " + queueingTaskMessageQueue);
@@ -263,6 +263,9 @@ public class SchedUtils {
 		return payload.getCmd();
 	}
 
+	public static int getQueueingTaskQueueSize() {
+		return queueingTaskMessageQueue.size();
+	}
 
 	private static String getUniqueId(Message m) {
 		MsgPayload payload = gson.fromJson(m.getMsg(), MsgPayload.class);
@@ -274,7 +277,7 @@ public class SchedUtils {
 		logExecutorService.submit(new Runnable() {
 			@Override
 			public void run() {
-				logger.info("write to redis");
+				logger.info("write to redis uuid:"+uuid+",msg:"+msg);
 //				try {
 //					IRedisService redisService = (IRedisService) SpringUtils.getBean("redisService");
 //					if (hint) {
