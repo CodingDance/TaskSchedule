@@ -7,7 +7,9 @@ import com.yiting.taskschedule.meta.QueueingTaskMessage;
 import com.yiting.taskschedule.service.ITaskQueueService;
 import com.yiting.taskschedule.task.Task;
 import com.yiting.taskschedule.util.SchedUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,7 @@ public class TaskQueueServiceImpl implements ITaskQueueService {
 	private static final Logger logger=Logger.getLogger(TaskQueueServiceImpl.class);
 	private volatile QueueingTaskMessage currentQueueingTaskMessage =null;
 
+	@Async
 	public void process() {
 		while (true){
 			try {
@@ -78,9 +81,28 @@ public class TaskQueueServiceImpl implements ITaskQueueService {
 				return Const.SCHED_RESULT_ALLOW;
 			}
 		}
+
+		/**
+		 * 排队操作，同一个资源的相同任务需要排队
+		 */
+		Message m = queueingTaskMessage.getMsg();
+		String queueKey = getQueueKey(queueingTaskMessage);
+		if (!StringUtils.isBlank(queueKey)) {
+			if (SchedUtils.isQueueKeyConflicted(queueKey)) { // 当前操作对象正在被处理，需排队。
+				logger.warn("待处理的操作对象已在处理中，需排队。 : " + m);
+				return Const.SCHED_RESULT_DENY;
+			}
+		}
+
 		return Const.SCHED_RESULT_ALLOW;
 	}
 
+	/**
+	 * 专门用于排队操作，当多个指令针对一个资源时，可能需要排队，不然先到的指令可能后执行，需要显放置在消息队列中，指导任务执行完毕，才放入线程池
+	 * 当前直接用uuid，其实是没有作用的
+	 * @param msg
+	 * @return
+	 */
 	private String getQueueKey(QueueingTaskMessage msg) {
 		return msg.getUuid();
 	}

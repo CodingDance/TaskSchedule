@@ -1,9 +1,10 @@
 package com.yiting.taskschedule.job;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.yiting.taskschedule.meta.ResultCode;
 import com.yiting.taskschedule.util.SchedUtils;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,16 +48,17 @@ public abstract class MessageJob extends Job {
 	}
 
 	private void sendMessage(String to, String cmd, Map<String, Object> content) {
-		JSONObject resultMsg = new JSONObject();
-		resultMsg.element("uniqueId", init.getUniqueId());
-		resultMsg.element("cmd", cmd);
-		resultMsg.element("content", content);
+		Gson gson=new Gson();
+		JsonObject resultMsg = new JsonObject();
+		resultMsg.addProperty("uniqueId", init.getUniqueId());
+		resultMsg.addProperty("cmd", cmd);
+		resultMsg.addProperty("content", gson.toJson(content));
 		// 优先发送给原消息的生产者，从fromSet中取。
 		String from = fromSet.get(to);
 		if (StringUtils.isBlank(from)) {
 			MQ.sendMessage(to, resultMsg.toString());
 		} else {
-			MQ.sendMessage(fromSet.get(to), resultMsg.toString());
+			MQ.sendMessage(from, resultMsg.toString());
 		}
 	}
 

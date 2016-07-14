@@ -1,0 +1,15 @@
+{
+    "Version": "v1",
+    "Metadata": {
+        "desc": "test1"
+    },
+    "BaseJob": "ResolveParamsJob",
+    "TestJob1": {
+        "default": "TestJob2"
+    },
+    "TestJob2": {
+         "default": "TestJob3"
+     },
+    "TestJob3": {}
+
+}

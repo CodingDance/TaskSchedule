@@ -1,6 +1,6 @@
 package com.yiting.taskschedule.common;
 
-import net.sf.json.JSONObject;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +80,7 @@ public class StatUtils {
 	}
 
 	public static String get() {
-		return JSONObject.fromObject(stats).toString();
+		Gson gson=new Gson();
+		return gson.toJson(stats);
 	}
 }

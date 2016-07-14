@@ -12,7 +12,7 @@ import com.yiting.taskschedule.meta.QueueingTaskMessage;
 import com.yiting.taskschedule.service.IRedisService;
 import com.yiting.taskschedule.service.ITaskQueueService;
 import com.yiting.taskschedule.task.Task;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
