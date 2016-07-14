@@ -54,6 +54,7 @@ public abstract class MessageJob extends Job {
 		resultMsg.addProperty("cmd", cmd);
 		resultMsg.addProperty("content", gson.toJson(content));
 		// 优先发送给原消息的生产者，从fromSet中取。
+		logger.info("send message:"+resultMsg.toString());
 		String from = fromSet.get(to);
 		if (StringUtils.isBlank(from)) {
 			MQ.sendMessage(to, resultMsg.toString());

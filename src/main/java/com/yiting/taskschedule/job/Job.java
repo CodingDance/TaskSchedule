@@ -11,9 +11,13 @@ import java.util.concurrent.Callable;
  */
 public abstract class Job implements Callable<Export> {
 	protected String taskName;
+
 	protected MsgPayload init;
+
 	protected Map<String,String> fromSet;
+
 	protected Export export=new Export();
+
 	abstract public Export call();
 
 	public void destory(){

@@ -11,12 +11,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by hzyiting on 2016/7/11.
  */
-@Component
+@Service
 public class TaskQueueServiceImpl implements ITaskQueueService {
 	private static final Logger logger=Logger.getLogger(TaskQueueServiceImpl.class);
 	private volatile QueueingTaskMessage currentQueueingTaskMessage =null;

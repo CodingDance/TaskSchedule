@@ -81,7 +81,7 @@ public class Task implements Callable<String>, Serializable {
 	}
 
 	public String call() throws Exception {
-		StatUtils.set(Const.STAT_CMD_ACC, Const.STAT_KEY_TASK_UUID, getUniqueId());
+		StatUtils.set(Const.STAT_CMD_SADD, Const.STAT_KEY_TASK_UUID, getUniqueId());
 		StatUtils.set(Const.STAT_CMD_SDEL, Const.STAT_KEY_TASK_STASHED_SET, getUniqueId());
 		runStatus = FLAG_RUNSTATUS_START;
 		SchedUtils.storeTask(payload.getUniqueId(), this);  //taskpools 保存了该task的状态start
@@ -104,6 +104,9 @@ public class Task implements Callable<String>, Serializable {
 				}
 				Future<Export> f = SchedUtils.execJob(job);
 				Export export = f.get();
+				if(export==null){
+					return null;
+				}
 				handleJobExport(jobName, export);
 				String result = export.getResult();
 				JsonObject nextJob = jobdefine.getAsJsonObject(cur);
@@ -191,9 +194,11 @@ public class Task implements Callable<String>, Serializable {
 
 	private void handleJobExport(String jobName, Export e) {
 		allExport.put(jobName, e);
-		Set<String> keys = e.getKeySet();
-		for (String key : keys) {
-			globalExport.put(key, e.get(key));
+		if(e!=null) {
+			Set<String> keys = e.getKeySet();
+			for (String key : keys) {
+				globalExport.put(key, e.get(key));
+			}
 		}
 	}
 

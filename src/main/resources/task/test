@@ -3,7 +3,7 @@
     "Metadata": {
         "desc": "test1"
     },
-    "BaseJob": "ResolveParamsJob",
+    "BaseJob": "TestJob1",
     "TestJob1": {
         "default": "TestJob2"
     },

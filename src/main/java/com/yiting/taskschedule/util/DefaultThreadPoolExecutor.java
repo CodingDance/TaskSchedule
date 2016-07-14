@@ -27,7 +27,7 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
 			try {
 				FutureTask futureTask = (FutureTask) runnable;
 				Class<?> futureTaskClz = futureTask.getClass();
-				Field callableField = futureTaskClz.getField("callable");
+				Field callableField = futureTaskClz.getDeclaredField("callable");
 				callableField.setAccessible(true);
 				Callable callable = (Callable) callableField.get(futureTask);
 				if (callable instanceof Job) {

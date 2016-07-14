@@ -19,12 +19,14 @@ import java.util.HashMap;
 import java.util.concurrent.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 /**
  * Created by hzyiting on 2016/7/11.
  */
+@Component
 public class SchedUtils {
 	private static Logger logger = Logger.getLogger(SchedUtils.class);
 	private static Gson gson=new Gson();
@@ -45,7 +47,7 @@ public class SchedUtils {
 	private static volatile boolean ifCouldShutDown=false;
 
 	@Autowired
-	private static String jobPackage=null;
+	private String jobPackage=null;
 
 	@Autowired
 	private IRedisService redisService;
