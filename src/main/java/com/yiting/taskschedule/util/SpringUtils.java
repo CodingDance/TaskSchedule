@@ -12,11 +12,7 @@ import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringValueResolver;
 
-/**
- * 获取Spring bean、placeholder值等。
- * @author Feng Changjian (hzfengchj@corp.netease.com)
- * @version $Id: SpringUtils.java, v 1.0 2015年3月6日 下午4:05:53
- */
+
 @Component
 public class SpringUtils implements ApplicationContextAware, EmbeddedValueResolverAware {
 
