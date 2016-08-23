@@ -2,8 +2,6 @@ package com.yiting.taskschedule.exception;
 
 /**
  * 
- * @author Feng Changjian (hzfengchj@corp.netease.com)
- * @version $Id: JobRuntimeException.java, v 1.0 2015年3月22日 下午9:35:21
  */
 public class JobRuntimeException extends RuntimeException {
 
