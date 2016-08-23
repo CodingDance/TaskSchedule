@@ -5,10 +5,6 @@ package com.yiting.taskschedule.common;
 
 
 /**
- * 指令平台全局变量
- * 
- * @author Feng Changjian (hzfengchj@corp.netease.com)
- * @version $Id: Const.java, v 1.0 2015年7月7日 下午7:58:07
  */
 public class Const {
 
